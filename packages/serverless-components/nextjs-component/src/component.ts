@@ -475,6 +475,9 @@ class NextjsComponent extends Component {
       this.pathPattern("_next/data/*", routesManifest)
     ] = {
       ttl: 0,
+      forward: {
+        headers: ["host"]
+      },
       allowedHttpMethods: ["HEAD", "GET"],
       "lambda@edge": {
         "origin-response": `${defaultEdgeLambdaOutputs.arn}:${defaultEdgeLambdaPublishOutputs.version}`,
