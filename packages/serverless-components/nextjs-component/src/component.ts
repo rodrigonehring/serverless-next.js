@@ -377,6 +377,7 @@ class NextjsComponent extends Component {
         ],
         // lambda@edge key is last and therefore cannot be overridden
         "lambda@edge": {
+          ...cloudFrontDefaultsInputs["lambda@edge"],
           "origin-request": `${apiEdgeLambdaOutputs.arn}:${apiEdgeLambdaPublishOutputs.version}`
         }
       };
@@ -462,6 +463,7 @@ class NextjsComponent extends Component {
         // spread custom config
         ...config,
         "lambda@edge": {
+          ...cloudFrontDefaultsInputs["lambda@edge"],
           // spread the provided value
           ...(cloudFrontOrigins[0].pathPatterns[path] &&
             cloudFrontOrigins[0].pathPatterns[path]["lambda@edge"]),
@@ -474,16 +476,19 @@ class NextjsComponent extends Component {
     cloudFrontOrigins[0].pathPatterns[
       this.pathPattern("_next/data/*", routesManifest)
     ] = {
-      ttl: 0,
+      ttl: 10,
       forward: {
-        headers: ["host"]
+        headers: ["original-host"]
       },
       allowedHttpMethods: ["HEAD", "GET"],
       "lambda@edge": {
-        "origin-response": `${defaultEdgeLambdaOutputs.arn}:${defaultEdgeLambdaPublishOutputs.version}`,
-        "origin-request": `${defaultEdgeLambdaOutputs.arn}:${defaultEdgeLambdaPublishOutputs.version}`
+        ...cloudFrontDefaultsInputs["lambda@edge"],
+        "origin-request": `${defaultEdgeLambdaOutputs.arn}:${defaultEdgeLambdaPublishOutputs.version}`,
+        "origin-response": `${defaultEdgeLambdaOutputs.arn}:${defaultEdgeLambdaPublishOutputs.version}`
       }
     };
+
+    console.log(cloudFrontOrigins[0]);
 
     // make sure that origin-response is not set.
     // this is reserved for serverless-next.js usage
